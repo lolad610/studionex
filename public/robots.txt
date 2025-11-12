@@ -1,0 +1,25 @@
+User-agent: *
+Allow: /
+Allow: /admin.html
+Disallow: /private/
+Disallow: /admin/
+Disallow: /.env
+Sitemap: https://studionex.com/sitemap.xml
+
+# Allow Google bots
+User-agent: Googlebot
+Allow: /
+
+# Allow Bing bots
+User-agent: Bingbot
+Allow: /
+
+# Block bad bots
+User-agent: AhrefsBot
+User-agent: SemrushBot
+User-agent: MJ12bot
+Disallow: /
+
+# Crawl delay for respectful indexing
+User-agent: *
+Crawl-delay: 1
