@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudioNex Admin Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .login-section {
+            padding: 30px;
+            text-align: center;
+            display: none;
+        }
+
+        .login-section.active {
+            display: block;
+        }
+
+        .login-section input {
+            width: 100%;
+            max-width: 300px;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .login-section input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .login-section button {
+            width: 100%;
+            max-width: 300px;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .login-section button:hover {
+            transform: translateY(-2px);
+        }
+
+        .dashboard {
+            padding: 30px;
+            display: none;
+        }
+
+        .dashboard.active {
+            display: block;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .number {
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .controls input {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .controls button {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        .controls button:hover {
+            background: #764ba2;
+        }
+
+        .submissions-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .submissions-table thead {
+            background: #f5f5f5;
+        }
+
+        .submissions-table th {
+            padding: 15px;
+            text-align: left;
+            font-weight: bold;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .submissions-table td {
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .submissions-table tr:hover {
+            background: #f9f9f9;
+        }
+
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-block;
+        }
+
+        .status-new {
+            background: #ffd700;
+            color: #333;
+        }
+
+        .status-reviewed {
+            background: #87ceeb;
+            color: white;
+        }
+
+        .status-contacted {
+            background: #90ee90;
+            color: white;
+        }
+
+        .status-closed {
+            background: #ddd;
+            color: white;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .actions button {
+            padding: 6px 12px;
+            font-size: 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .actions button:hover {
+            opacity: 0.8;
+        }
+
+        .edit-btn {
+            background: #667eea;
+            color: white;
+        }
+
+        .delete-btn {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .modal-field {
+            margin-bottom: 20px;
+        }
+
+        .modal-field label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .modal-field input,
+        .modal-field textarea,
+        .modal-field select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .modal-field textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .modal-actions button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: opacity 0.2s;
+        }
+
+        .modal-actions button:hover {
+            opacity: 0.8;
+        }
+
+        .save-btn {
+            background: #667eea;
+            color: white;
+        }
+
+        .cancel-btn {
+            background: #ddd;
+            color: #333;
+        }
+
+        .logout-btn {
+            background: #ff6b6b;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .error {
+            color: #ff6b6b;
+            padding: 15px;
+            background: #ffe6e6;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .error.active {
+            display: block;
+        }
+
+        .success {
+            color: #2ecc71;
+            padding: 15px;
+            background: #e8f8f5;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .success.active {
+            display: block;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-header {
+                flex-direction: column;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            .controls input {
+                min-width: 100%;
+            }
+
+            .submissions-table {
+                font-size: 12px;
+            }
+
+            .submissions-table th,
+            .submissions-table td {
+                padding: 10px;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            .actions button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎮 StudioNex Admin Dashboard</h1>
+            <p>Manage contact submissions and leads</p>
+        </div>
+
+        <!-- Login Section -->
+        <div class="login-section active" id="loginSection">
+            <h2 style="margin-bottom: 20px;">Admin Login</h2>
+            <div class="error" id="loginError"></div>
+            <input type="password" id="apiKeyInput" placeholder="Enter API Key" />
+            <button onclick="login()">Login</button>
+        </div>
+
+        <!-- Dashboard Section -->
+        <div class="dashboard" id="dashboard">
+            <div class="dashboard-header">
+                <div>
+                    <h2>Dashboard</h2>
+                    <p style="color: #666; font-size: 14px; margin-top: 5px;">Logged in successfully</p>
+                </div>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+
+            <div class="success" id="successMessage"></div>
+            <div class="error" id="dashboardError"></div>
+
+            <div class="stats" id="statsContainer">
+                <div class="stat-card">
+                    <h3>Total Submissions</h3>
+                    <div class="number" id="totalCount">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>New Leads</h3>
+                    <div class="number" id="newCount">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Reviewed</h3>
+                    <div class="number" id="reviewedCount">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Contacted</h3>
+                    <div class="number" id="contactedCount">0</div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <input type="text" id="searchInput" placeholder="Search by name, email, or discord..." />
+                <button onclick="search()">Search</button>
+                <button onclick="loadSubmissions()" style="background: #27ae60;">Refresh</button>
+            </div>
+
+            <div class="loading" id="loadingSpinner" style="display: none;">
+                Loading submissions...
+            </div>
+
+            <table class="submissions-table" id="submissionsTable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Service</th>
+                        <th>Budget</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="submissionsBody">
+                    <tr><td colspan="7" style="text-align: center; color: #999;">No submissions yet</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <div class="modal-header">Edit Submission</div>
+            <div class="error" id="modalError"></div>
+
+            <div class="modal-field">
+                <label>Name</label>
+                <input type="text" id="editName" readonly style="background: #f5f5f5;" />
+            </div>
+
+            <div class="modal-field">
+                <label>Email</label>
+                <input type="email" id="editEmail" readonly style="background: #f5f5f5;" />
+            </div>
+
+            <div class="modal-field">
+                <label>Discord</label>
+                <input type="text" id="editDiscord" readonly style="background: #f5f5f5;" />
+            </div>
+
+            <div class="modal-field">
+                <label>Service</label>
+                <input type="text" id="editService" readonly style="background: #f5f5f5;" />
+            </div>
+
+            <div class="modal-field">
+                <label>Budget</label>
+                <input type="text" id="editBudget" readonly style="background: #f5f5f5;" />
+            </div>
+
+            <div class="modal-field">
+                <label>Status</label>
+                <select id="editStatus">
+                    <option value="new">New</option>
+                    <option value="reviewed">Reviewed</option>
+                    <option value="contacted">Contacted</option>
+                    <option value="closed">Closed</option>
+                </select>
+            </div>
+
+            <div class="modal-field">
+                <label>Notes</label>
+                <textarea id="editNotes" placeholder="Add your notes here..."></textarea>
+            </div>
+
+            <div class="modal-field">
+                <label>Message</label>
+                <textarea id="editMessage" readonly style="background: #f5f5f5;"></textarea>
+            </div>
+
+            <div class="modal-actions">
+                <button class="cancel-btn" onclick="closeModal()">Cancel</button>
+                <button class="save-btn" onclick="saveChanges()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = window.location.origin;
+        let currentApiKey = null;
+        let currentSubmissionId = null;
+
+        function login() {
+            const apiKey = document.getElementById('apiKeyInput').value.trim();
+            if (!apiKey) {
+                showError('loginError', 'Please enter an API key');
+                return;
+            }
+
+            fetch(`${API_BASE}/api/stats`, {
+                headers: { 'x-api-key': apiKey }
+            })
+            .then(res => res.ok ? res.json() : Promise.reject('Invalid API key'))
+            .then(() => {
+                currentApiKey = apiKey;
+                localStorage.setItem('adminApiKey', apiKey);
+                document.getElementById('loginSection').classList.remove('active');
+                document.getElementById('dashboard').classList.add('active');
+                loadSubmissions();
+            })
+            .catch(() => showError('loginError', 'Invalid API key. Please try again.'));
+        }
+
+        function logout() {
+            currentApiKey = null;
+            localStorage.removeItem('adminApiKey');
+            document.getElementById('loginSection').classList.add('active');
+            document.getElementById('dashboard').classList.remove('active');
+            document.getElementById('apiKeyInput').value = '';
+            document.getElementById('loginError').classList.remove('active');
+        }
+
+        function loadSubmissions() {
+            document.getElementById('loadingSpinner').style.display = 'block';
+            fetch(`${API_BASE}/api/submissions`, {
+                headers: { 'x-api-key': currentApiKey }
+            })
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('loadingSpinner').style.display = 'none';
+                if (data.submissions) {
+                    displaySubmissions(data.submissions);
+                    updateStats(data.submissions);
+                } else {
+                    showError('dashboardError', 'Failed to load submissions');
+                }
+            })
+            .catch(() => {
+                document.getElementById('loadingSpinner').style.display = 'none';
+                showError('dashboardError', 'Error loading submissions');
+            });
+        }
+
+        function displaySubmissions(submissions) {
+            const tbody = document.getElementById('submissionsBody');
+            if (submissions.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #999;">No submissions yet</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = submissions.map(sub => `
+                <tr>
+                    <td>${sub.name}</td>
+                    <td>${sub.email}</td>
+                    <td>${sub.service}</td>
+                    <td>$${sub.budget || 'N/A'}</td>
+                    <td><span class="status-badge status-${sub.status}">${sub.status}</span></td>
+                    <td>${new Date(sub.createdAt).toLocaleDateString()}</td>
+                    <td>
+                        <div class="actions">
+                            <button class="edit-btn" onclick="openEditModal('${sub._id}', ${JSON.stringify(sub)})">Edit</button>
+                            <button class="delete-btn" onclick="deleteSubmission('${sub._id}')">Delete</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updateStats(submissions) {
+            const total = submissions.length;
+            const newCount = submissions.filter(s => s.status === 'new').length;
+            const reviewedCount = submissions.filter(s => s.status === 'reviewed').length;
+            const contactedCount = submissions.filter(s => s.status === 'contacted').length;
+
+            document.getElementById('totalCount').textContent = total;
+            document.getElementById('newCount').textContent = newCount;
+            document.getElementById('reviewedCount').textContent = reviewedCount;
+            document.getElementById('contactedCount').textContent = contactedCount;
+        }
+
+        function openEditModal(id, submission) {
+            currentSubmissionId = id;
+            document.getElementById('editName').value = submission.name;
+            document.getElementById('editEmail').value = submission.email;
+            document.getElementById('editDiscord').value = submission.discord || '';
+            document.getElementById('editService').value = submission.service;
+            document.getElementById('editBudget').value = submission.budget || '';
+            document.getElementById('editStatus').value = submission.status;
+            document.getElementById('editNotes').value = submission.notes || '';
+            document.getElementById('editMessage').value = submission.message || submission.details || '';
+            document.getElementById('editModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('editModal').classList.remove('active');
+            currentSubmissionId = null;
+        }
+
+        function saveChanges() {
+            const status = document.getElementById('editStatus').value;
+            const notes = document.getElementById('editNotes').value;
+
+            fetch(`${API_BASE}/api/submissions/${currentSubmissionId}`, {
+                method: 'PUT',
+                headers: {
+                    'x-api-key': currentApiKey,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ status, notes })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.submission) {
+                    closeModal();
+                    showSuccess('Changes saved successfully!');
+                    loadSubmissions();
+                } else {
+                    showError('modalError', 'Failed to save changes');
+                }
+            })
+            .catch(() => showError('modalError', 'Error saving changes'));
+        }
+
+        function deleteSubmission(id) {
+            if (!confirm('Are you sure you want to delete this submission?')) return;
+
+            fetch(`${API_BASE}/api/submissions/${id}`, {
+                method: 'DELETE',
+                headers: { 'x-api-key': currentApiKey }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    showSuccess('Submission deleted successfully!');
+                    loadSubmissions();
+                } else {
+                    showError('dashboardError', 'Failed to delete submission');
+                }
+            })
+            .catch(() => showError('dashboardError', 'Error deleting submission'));
+        }
+
+        function search() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const rows = document.querySelectorAll('#submissionsBody tr');
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(query) ? '' : 'none';
+            });
+        }
+
+        function showError(elementId, message) {
+            const el = document.getElementById(elementId);
+            el.textContent = message;
+            el.classList.add('active');
+            setTimeout(() => el.classList.remove('active'), 5000);
+        }
+
+        function showSuccess(message) {
+            const el = document.getElementById('successMessage');
+            el.textContent = message;
+            el.classList.add('active');
+            setTimeout(() => el.classList.remove('active'), 5000);
+        }
+
+        // Auto-login if API key is saved
+        window.addEventListener('load', () => {
+            const saved = localStorage.getItem('adminApiKey');
+            if (saved) {
+                document.getElementById('apiKeyInput').value = saved;
+                login();
+            }
+        });
+
+        // Search on Enter key
+        document.addEventListener('keypress', (e) => {
+            if (e.target.id === 'searchInput' && e.key === 'Enter') search();
+        });
+    </script>
+</body>
+</html>
