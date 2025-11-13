@@ -119,3 +119,8 @@ AddDefaultCharset utf-8
     Header unset ETag
     FileETag None
 </IfModule>
+
+MONGODB_URI=mongodb+srv://<user>:<password>@cluster0.mongodb.net/studionex?retryWrites=true&w=majority
+SMTP_USER=youremail@gmail.com
+SMTP_PASS=your-16-char-app-password
+FRONTEND_URL=https://your-vercel-url-or-domain
